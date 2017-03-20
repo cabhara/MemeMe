@@ -71,7 +71,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func getKeyboardHeight(_ notification:Notification) -> CGFloat {
         
         let userInfo = notification.userInfo
-        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
+        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
         return keyboardSize.cgRectValue.height
     }
     
@@ -127,7 +127,6 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             //share
             let image = [ memedImage ]
             let activityViewController = UIActivityViewController(activityItems: image, applicationActivities: nil)
-            //activityViewController.popoverPresentationController?.sourceView = self.view // so that iPads won't crash
             
             activityViewController.completionWithItemsHandler = {
                 (s, ok, items, err) in
