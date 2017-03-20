@@ -91,6 +91,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         topTextField.text = "TOP"
         bottomTextField.text = "BOTTOM"
         imagePickerView.image = nil
+        topNotEdited = true
+        bottomNotEdited = true
     }
     
     func save(memedImage:UIImage) {
@@ -118,21 +120,28 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     @IBAction func shareMeme(_ sender: Any) {
-        //generate and save meme
-        let memedImage = generateMemedImage()
-        //share
-        let image = [ memedImage ]
-        let activityViewController = UIActivityViewController(activityItems: image, applicationActivities: nil)
-        //activityViewController.popoverPresentationController?.sourceView = self.view // so that iPads won't crash
-        
-        activityViewController.completionWithItemsHandler = {
-            (s, ok, items, err) in
-            self.save(memedImage: memedImage)
+        if imagePickerView.image != nil{
+            
+            //generate and save meme
+            let memedImage = generateMemedImage()
+            //share
+            let image = [ memedImage ]
+            let activityViewController = UIActivityViewController(activityItems: image, applicationActivities: nil)
+            //activityViewController.popoverPresentationController?.sourceView = self.view // so that iPads won't crash
+            
+            activityViewController.completionWithItemsHandler = {
+                (s, ok, items, err) in
+                self.save(memedImage: memedImage)
+            }
+            
+            // present the view controller
+            self.present(activityViewController, animated: true, completion: nil)
+            
+        } else{
+            showAlert("Issue sharing meme", message: "Please select an image")
         }
         
-        // present the view controller
-        self.present(activityViewController, animated: true, completion: nil)
-        
+            
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -171,13 +180,20 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         return memedImage
     }
     
+    func showAlert(_ title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
     
     //MARK: - TextField Delegate
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField==topTextField && topNotEdited {
+            topNotEdited = false
             textField.text = ""
         } else if textField==bottomTextField && bottomNotEdited {
+            bottomNotEdited = false
             textField.text = ""
         }
     }
