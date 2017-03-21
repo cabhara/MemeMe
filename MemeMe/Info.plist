@@ -42,5 +42,9 @@
 	<string>Needs access to camera for memes</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Needs access to photo library to make memes</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>impact.ttf</string>
+	</array>
 </dict>
 </plist>
