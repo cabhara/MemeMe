@@ -82,7 +82,7 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     }
     
     @IBAction func cancel(_ sender: Any) {
-        initFields()
+        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func shareMeme(_ sender: Any) {
@@ -100,11 +100,11 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
                     return
                 }
                 self.save(memedImage: memedImage)
+                self.dismiss(animated: true, completion: nil)
             }
             
             // present the view controller
             present(activityViewController, animated: true, completion: nil)
-            
         } else{
             showAlert("Issue sharing meme", message: "Please select an image")
         }
@@ -114,6 +114,7 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     func save(memedImage:UIImage) {
         // save the meme
         meme = Meme(top:topTextField.text!, bottom: bottomTextField.text!, original: imagePickerView.image!, memed: memedImage)
+        (UIApplication.shared.delegate as! AppDelegate).memes.append(meme!)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
