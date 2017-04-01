@@ -34,19 +34,8 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let style = NSMutableParagraphStyle()
-        style.alignment = NSTextAlignment.center
-        
-        let memeTextAttributes:[String:Any] = [
-            NSStrokeColorAttributeName: UIColor.black,
-            NSForegroundColorAttributeName: UIColor.white,
-            NSFontAttributeName: UIFont(name: "Impact", size: 40)!,
-            NSStrokeWidthAttributeName: "-3.0",
-            NSParagraphStyleAttributeName: style]
-        
-        topTextField.defaultTextAttributes = memeTextAttributes;
-        bottomTextField.defaultTextAttributes = memeTextAttributes;
-
+        configure(textField: topTextField, text: "TOP")
+        configure(textField: bottomTextField, text: "BOTTOM")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -60,12 +49,19 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
         unsubscribeFromKeyboardNotifications()
     }
     
-    func initFields(){
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-        imagePickerView.image = nil
-        topNotEdited = true
-        bottomNotEdited = true
+    func configure(textField: UITextField, text: String){
+        let style = NSMutableParagraphStyle()
+        style.alignment = NSTextAlignment.center
+        
+        let memeTextAttributes:[String:Any] = [
+            NSStrokeColorAttributeName: UIColor.black,
+            NSForegroundColorAttributeName: UIColor.white,
+            NSFontAttributeName: UIFont(name: "Impact", size: 40)!,
+            NSStrokeWidthAttributeName: "-3.0",
+            NSParagraphStyleAttributeName: style]
+
+        textField.text = text
+        textField.defaultTextAttributes = memeTextAttributes
     }
     
     //MARK: - IBActions
@@ -86,28 +82,28 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     }
     
     @IBAction func shareMeme(_ sender: Any) {
-        if imagePickerView.image != nil{
-            
-            //generate and save meme
-            let memedImage = generateMemedImage()
-            //share
-            let image = [ memedImage ]
-            let activityViewController = UIActivityViewController(activityItems: image, applicationActivities: nil)
-            
-            activityViewController.completionWithItemsHandler = {
-                (s, ok, items, err) in
-                if !ok {
-                    return
-                }
-                self.save(memedImage: memedImage)
-                self.dismiss(animated: true, completion: nil)
-            }
-            
-            // present the view controller
-            present(activityViewController, animated: true, completion: nil)
-        } else{
+        guard imagePickerView.image != nil else {
             showAlert("Issue sharing meme", message: "Please select an image")
+            return
         }
+        
+        //generate and save meme
+        let memedImage = generateMemedImage()
+        //share
+        let image = [ memedImage ]
+        let activityViewController = UIActivityViewController(activityItems: image, applicationActivities: nil)
+        
+        activityViewController.completionWithItemsHandler = {
+            (s, ok, items, err) in
+            if !ok {
+                return
+            }
+            self.save(memedImage: memedImage)
+            self.dismiss(animated: true, completion: nil)
+        }
+        
+        // present the view controller
+        present(activityViewController, animated: true, completion: nil)
     }
     
     //MARK: - Image functions
@@ -132,10 +128,21 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
         dismiss(animated: true, completion: nil)
     }
     
+    func configureBars(hidden:Bool){
+        if hidden {
+            //hide
+            navBar.isHidden = true
+            toolBar.isHidden = true
+        } else{
+            //hide
+            navBar.isHidden = false
+            toolBar.isHidden = false
+        }
+    }
+    
     func generateMemedImage() -> UIImage {
         //hide
-        navBar.isHidden = true
-        toolBar.isHidden = true
+        configureBars(hidden: true)
         
         // Render view to an image
         UIGraphicsBeginImageContext(view.frame.size)
@@ -144,8 +151,7 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
         UIGraphicsEndImageContext()
         
         //show
-        navBar.isHidden = false
-        toolBar.isHidden = false
+        configureBars(hidden: false)
         
         return memedImage
     }
@@ -186,6 +192,8 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     func unsubscribeFromKeyboardNotifications() {
         
         NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
     }
     
     //MARK: - TextField Delegate
